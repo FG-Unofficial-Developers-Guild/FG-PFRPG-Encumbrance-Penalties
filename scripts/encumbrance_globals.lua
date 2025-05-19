@@ -3,17 +3,17 @@
 --
 --	Armor that has a max dex of 0 (I promise this was the only way)
 --	luacheck: globals tClumsyArmorTypes
-tClumsyArmorTypes = { "Fortress plate", "Half-plate", "Lamellar (iron)", "Lamellar (stone coat)", "Splint mail" }
+tClumsyArmorTypes = { 'Fortress plate', 'Half-plate', 'Lamellar (iron)', 'Lamellar (stone coat)', 'Splint mail' }
 
 --	process tClumsyArmorTypes to escape and special characters
 function onInit()
-	local tSpecialCharacters = { "%(", "%)", "%.", "%+", "%-", "%*", "%?", "%[", "%^", "%$" }
+	local tSpecialCharacters = { '%(', '%)', '%.', '%+', '%-', '%*', '%?', '%[', '%^', '%$' }
 
 	for i, _ in ipairs(tClumsyArmorTypes) do
-		tClumsyArmorTypes[i] = string.gsub(tClumsyArmorTypes[i], "%%", "%%%%")
+		tClumsyArmorTypes[i] = string.gsub(tClumsyArmorTypes[i], '%%', '%%%%')
 
 		for _, vv in ipairs(tSpecialCharacters) do
-			tClumsyArmorTypes[i] = string.gsub(tClumsyArmorTypes[i], vv, "%" .. vv)
+			tClumsyArmorTypes[i] = string.gsub(tClumsyArmorTypes[i], vv, '%' .. vv)
 		end
 	end
 end
@@ -31,28 +31,28 @@ nMediumCheckPenalty = -3
 --	Encumbered Speed Equivalents to Base Speeds from 5-120
 --	luacheck: globals tEncumbranceSpeed
 tEncumbranceSpeed = {
-	"5",
-	"10",
-	"10",
-	"15",
-	"20",
-	"20",
-	"25",
-	"30",
-	"30",
-	"35",
-	"40",
-	"40",
-	"45",
-	"50",
-	"50",
-	"55",
-	"60",
-	"60",
-	"65",
-	"70",
-	"70",
-	"75",
-	"80",
-	"80",
+	'5',
+	'10',
+	'10',
+	'15',
+	'20',
+	'20',
+	'25',
+	'30',
+	'30',
+	'35',
+	'40',
+	'40',
+	'45',
+	'50',
+	'50',
+	'55',
+	'60',
+	'60',
+	'65',
+	'70',
+	'70',
+	'75',
+	'80',
+	'80',
 }

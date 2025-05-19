@@ -5,14 +5,14 @@
 
 function encumbranceColors()
 	if window.usearmormaxstatbonus.getValue() == 0 then
-		setColor(ColorManager.getUIColor("usage_full"))
+		setColor(ColorManager.getUIColor('usage_full'))
 	else
 		local nodeEnc = DB.getParent(getDatabaseNode())
-		local sArmorStat = getName():gsub("armor", "")
-		if DB.getValue(nodeEnc, sArmorStat .. "fromenc") == DB.getValue(nodeEnc, "armor" .. sArmorStat) then
-			setColor(ColorManager.getUIColor("health_wounds_critical"))
+		local sArmorStat = getName():gsub('armor', '')
+		if DB.getValue(nodeEnc, sArmorStat .. 'fromenc') == DB.getValue(nodeEnc, 'armor' .. sArmorStat) then
+			setColor(ColorManager.getUIColor('health_wounds_critical'))
 		else
-			setColor(ColorManager.getUIColor("usage_full"))
+			setColor(ColorManager.getUIColor('usage_full'))
 		end
 	end
 end

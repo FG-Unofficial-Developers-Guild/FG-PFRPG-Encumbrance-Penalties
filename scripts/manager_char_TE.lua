@@ -12,18 +12,18 @@ local function getStrEffectBonus(rActor, nodeChar)
 		return 0
 	end
 
-	local nStrEffectMod = EffectManager35EDS.getEffectsBonus(rActor, "CARRY", true)
-	if EffectManager35EDS.hasEffectCondition(rActor, "Exhausted") then
+	local nStrEffectMod = EffectManager35EDS.getEffectsBonus(rActor, 'CARRY', true)
+	if EffectManager35EDS.hasEffectCondition(rActor, 'Exhausted') then
 		nStrEffectMod = nStrEffectMod - 6
-	elseif EffectManager35EDS.hasEffectCondition(rActor, "Fatigued") then
+	elseif EffectManager35EDS.hasEffectCondition(rActor, 'Fatigued') then
 		nStrEffectMod = nStrEffectMod - 2
 	end
 	-- include STR effects in calculating carrying capacity
 	if not DataCommon.isPFRPG() then
-		nStrEffectMod = nStrEffectMod + (EffectManager35EDS.getEffectsBonus(rActor, "STR", true) or 0)
+		nStrEffectMod = nStrEffectMod + (EffectManager35EDS.getEffectsBonus(rActor, 'STR', true) or 0)
 	end
 
-	DB.setValue(nodeChar, "encumbrance.strbonusfromeffects", "number", nStrEffectMod)
+	DB.setValue(nodeChar, 'encumbrance.strbonusfromeffects', 'number', nStrEffectMod)
 
 	return nStrEffectMod
 end
@@ -33,26 +33,21 @@ function onEncumbranceLimitChanged(nodeChar)
 
 	local nHeavy = 0
 
-	local nStrength = DB.getValue(nodeChar, "abilities.strength.score", 10)
+	local nStrength = DB.getValue(nodeChar, 'abilities.strength.score', 10)
 
 	local nStrengthDamage = 0
 	if not DataCommon.isPFRPG() then
-		nStrengthDamage = DB.getValue(nodeChar, "abilities.strength.damage", 0)
+		nStrengthDamage = DB.getValue(nodeChar, 'abilities.strength.damage', 0)
 	end
 
-	if
-		DB.getValue(nodeChar, "encumbrance.stradj", 0) == 0 and CharManager.hasTrait(nodeChar, "Muscle of the Society")
-	then
-		DB.removeHandler(DB.getPath(nodeChar, "encumbrance.stradj"), "onUpdate", onStrengthChanged)
-		DB.setValue(nodeChar, "encumbrance.stradj", 2)
-		DB.addHandler(DB.getPath(nodeChar, "encumbrance.stradj"), "onUpdate", onStrengthChanged)
+	if DB.getValue(nodeChar, 'encumbrance.stradj', 0) == 0 and CharManager.hasTrait(nodeChar, 'Muscle of the Society') then
+		DB.removeHandler(DB.getPath(nodeChar, 'encumbrance.stradj'), 'onUpdate', onStrengthChanged)
+		DB.setValue(nodeChar, 'encumbrance.stradj', 2)
+		DB.addHandler(DB.getPath(nodeChar, 'encumbrance.stradj'), 'onUpdate', onStrengthChanged)
 	end
 
-	nStrength = nStrength
-		+ getStrEffectBonus(rActor, nodeChar)
-		- nStrengthDamage
-		+ DB.getValue(nodeChar, "encumbrance.stradj", 0)
-	if EffectManager35EDS.hasEffectCondition(rActor, "Paralyzed") then
+	nStrength = nStrength + getStrEffectBonus(rActor, nodeChar) - nStrengthDamage + DB.getValue(nodeChar, 'encumbrance.stradj', 0)
+	if EffectManager35EDS.hasEffectCondition(rActor, 'Paralyzed') then
 		nStrength = 0
 	end
 
@@ -60,16 +55,14 @@ function onEncumbranceLimitChanged(nodeChar)
 		if nStrength <= 10 then
 			nHeavy = nStrength * 10
 		else
-			nHeavy = 1.25
-				* math.pow(2, math.floor(nStrength / 5))
-				* math.floor((20 * math.pow(2, math.fmod(nStrength, 5) / 5)) + 0.5)
+			nHeavy = 1.25 * math.pow(2, math.floor(nStrength / 5)) * math.floor((20 * math.pow(2, math.fmod(nStrength, 5) / 5)) + 0.5)
 		end
 	end
 
-	nHeavy = math.floor(nHeavy * DB.getValue(nodeChar, "encumbrance.carrymult", 1))
+	nHeavy = math.floor(nHeavy * DB.getValue(nodeChar, 'encumbrance.carrymult', 1))
 
 	-- Check for carrying capacity multiplier attached to PC on combat tracker. If found, multiply their carrying capacity.
-	local nCarryMult = EffectManager35EDS.getEffectsBonus(rActor, "CARRYMULT", true) or 0
+	local nCarryMult = EffectManager35EDS.getEffectsBonus(rActor, 'CARRYMULT', true) or 0
 	if nCarryMult ~= 0 then
 		nHeavy = nHeavy * nCarryMult
 	end
@@ -110,12 +103,12 @@ function onEncumbranceLimitChanged(nodeChar)
 		nPushDrag = nPushDrag * nMult
 	end
 
-	DB.setValue(nodeChar, "encumbrance.lightload", "number", nLight)
-	DB.setValue(nodeChar, "encumbrance.mediumload", "number", nMedium)
-	DB.setValue(nodeChar, "encumbrance.heavyload", "number", nHeavy)
-	DB.setValue(nodeChar, "encumbrance.liftoverhead", "number", nLiftOver)
-	DB.setValue(nodeChar, "encumbrance.liftoffground", "number", nLiftOff)
-	DB.setValue(nodeChar, "encumbrance.pushordrag", "number", nPushDrag)
+	DB.setValue(nodeChar, 'encumbrance.lightload', 'number', nLight)
+	DB.setValue(nodeChar, 'encumbrance.mediumload', 'number', nMedium)
+	DB.setValue(nodeChar, 'encumbrance.heavyload', 'number', nHeavy)
+	DB.setValue(nodeChar, 'encumbrance.liftoverhead', 'number', nLiftOver)
+	DB.setValue(nodeChar, 'encumbrance.liftoffground', 'number', nLiftOff)
+	DB.setValue(nodeChar, 'encumbrance.pushordrag', 'number', nPushDrag)
 end
 
 ---	This function checks for special abilities.
@@ -125,8 +118,8 @@ local function hasSpecialAbility(nodeChar, sSpecAbil)
 	end
 
 	local sLowerSpecAbil = string.lower(sSpecAbil)
-	for _, vNode in ipairs(DB.getChildList(nodeChar, "specialabilitylist")) do
-		local vLowerSpecAbilName = StringManager.trim(DB.getValue(vNode, "name", ""):lower())
+	for _, vNode in ipairs(DB.getChildList(nodeChar, 'specialabilitylist')) do
+		local vLowerSpecAbilName = StringManager.trim(DB.getValue(vNode, 'name', ''):lower())
 		if vLowerSpecAbilName and string.find(vLowerSpecAbilName, sLowerSpecAbil, 0) then
 			return true
 		end
@@ -141,25 +134,22 @@ local function getSpeedMult(nodeChar)
 	end
 	if
 		ActorHealthManager.isDyingOrDead(rActor)
-		or EffectManager35EDS.hasEffectCondition(rActor, "Grappled")
-		or EffectManager35EDS.hasEffectCondition(rActor, "Paralyzed")
-		or EffectManager35EDS.hasEffectCondition(rActor, "Petrified")
-		or EffectManager35EDS.hasEffectCondition(rActor, "Pinned")
+		or EffectManager35EDS.hasEffectCondition(rActor, 'Grappled')
+		or EffectManager35EDS.hasEffectCondition(rActor, 'Paralyzed')
+		or EffectManager35EDS.hasEffectCondition(rActor, 'Petrified')
+		or EffectManager35EDS.hasEffectCondition(rActor, 'Pinned')
 	then
 		nMult = 0
 	elseif
-		EffectManager35EDS.hasEffectCondition(rActor, "Exhausted")
-		or EffectManager35EDS.hasEffectCondition(rActor, "Entangled")
+		EffectManager35EDS.hasEffectCondition(rActor, 'Exhausted')
+		or EffectManager35EDS.hasEffectCondition(rActor, 'Entangled')
 		--	Check if the character is disabled (at zero remaining hp)
-		or (
-			(DB.getValue(nodeChar, "level", 0) ~= 0)
-			and (DB.getValue(nodeChar, "hp.total", 0) == DB.getValue(nodeChar, "hp.wounds", 0))
-		)
+		or ((DB.getValue(nodeChar, 'level', 0) ~= 0) and (DB.getValue(nodeChar, 'hp.total', 0) == DB.getValue(nodeChar, 'hp.wounds', 0)))
 	then
 		nMult = nMult * 0.5
 	end
-	if EffectManager35EDS.getEffectsBonus(rActor, "SPEEDMULT", true) ~= 0 then
-		nMult = nMult * EffectManager35EDS.getEffectsBonus(rActor, "SPEEDMULT", true)
+	if EffectManager35EDS.getEffectsBonus(rActor, 'SPEEDMULT', true) ~= 0 then
+		nMult = nMult * EffectManager35EDS.getEffectsBonus(rActor, 'SPEEDMULT', true)
 	end
 
 	return nMult
@@ -178,23 +168,23 @@ local function getSpeedEffects(nodeChar)
 	local function fastMovement()
 		local nReturn = 0
 
-		if hasSpecialAbility(nodeChar, "Fast Movement") then
-			local bEncumberedH = (DB.getValue(nodeChar, "encumbrance.encumbrancelevel", 0) >= 2)
-			local bArmorH = (DB.getValue(nodeChar, "encumbrance.armortype", 0) == 2)
+		if hasSpecialAbility(nodeChar, 'Fast Movement') then
+			local bEncumberedH = (DB.getValue(nodeChar, 'encumbrance.encumbrancelevel', 0) >= 2)
+			local bArmorH = (DB.getValue(nodeChar, 'encumbrance.armortype', 0) == 2)
 			if not bEncumberedH and not bArmorH then
 				nReturn = 10
-				DB.setValue(nodeChar, "speed.fastmovement", "number", 10)
+				DB.setValue(nodeChar, 'speed.fastmovement', 'number', 10)
 			else
-				DB.setValue(nodeChar, "speed.fastmovement", "number", 0)
+				DB.setValue(nodeChar, 'speed.fastmovement', 'number', 0)
 			end
 		else
-			DB.setValue(nodeChar, "speed.fastmovement", "number", 0)
+			DB.setValue(nodeChar, 'speed.fastmovement', 'number', 0)
 		end
 
 		return nReturn
 	end
 
-	return fastMovement() + EffectManager35EDS.getEffectsBonus(rActor, "SPEED", true)
+	return fastMovement() + EffectManager35EDS.getEffectsBonus(rActor, 'SPEED', true)
 end
 
 --	Summary: Finds the max stat and check penalty penalties based on medium and heavy encumbrance thresholds based on current total encumbrance
@@ -206,9 +196,9 @@ end
 local function encumbrancePenalties(nodeChar)
 	onEncumbranceLimitChanged(nodeChar)
 
-	local light = DB.getValue(nodeChar, "encumbrance.lightload", 0)
-	local medium = DB.getValue(nodeChar, "encumbrance.mediumload", 0)
-	local heavy = DB.getValue(nodeChar, "encumbrance.heavyload", 0)
+	local light = DB.getValue(nodeChar, 'encumbrance.lightload', 0)
+	local medium = DB.getValue(nodeChar, 'encumbrance.mediumload', 0)
+	local heavy = DB.getValue(nodeChar, 'encumbrance.heavyload', 0)
 	local total = DB.getValue(nodeChar, CharEncumbranceManager.getEncumbranceField(), 0)
 
 	local nEncumbranceLevel = 0
@@ -231,16 +221,16 @@ local function encumbrancePenalties(nodeChar)
 		nCheckPenalty = TEGlobals.nMediumCheckPenalty
 	end
 
-	DB.setValue(nodeChar, "encumbrance.encumbrancelevel", "number", nEncumbranceLevel)
+	DB.setValue(nodeChar, 'encumbrance.encumbrancelevel', 'number', nEncumbranceLevel)
 
 	return nMaxStat, nCheckPenalty, nEncumbranceLevel
 end
 
 local function armorTraining(nodeChar)
-	local nFighterLevel = DB.getValue(CharManager.getClassNode(nodeChar, "Fighter"), "level", 0)
-	local bArmorTraining = (hasSpecialAbility(nodeChar, "Armor Training") and nFighterLevel >= 3)
+	local nFighterLevel = DB.getValue(CharManager.getClassNode(nodeChar, 'Fighter'), 'level', 0)
+	local bArmorTraining = (hasSpecialAbility(nodeChar, 'Armor Training') and nFighterLevel >= 3)
 	local bArmorTrainingH = (bArmorTraining and nFighterLevel >= 7)
-	local bAdvArmorTraining = (hasSpecialAbility(nodeChar, "Advanced Armor Training"))
+	local bAdvArmorTraining = (hasSpecialAbility(nodeChar, 'Advanced Armor Training'))
 
 	return nFighterLevel, bArmorTraining, bArmorTrainingH, bAdvArmorTraining
 end
@@ -260,38 +250,36 @@ local function calcItemArmorClass_new(nodeChar)
 	local bArmorLM = false
 	local bArmorH = false
 
-	for _, vNode in ipairs(DB.getChildList(nodeChar, "inventorylist")) do
-		if DB.getValue(vNode, "carried", 0) == 2 then
+	for _, vNode in ipairs(DB.getChildList(nodeChar, 'inventorylist')) do
+		if DB.getValue(vNode, 'carried', 0) == 2 then
 			if ItemManager.isArmor(vNode) then
 				local nFighterLevel, bArmorTraining, bArmorTrainingH, bAdvArmorTraining = armorTraining(nodeChar)
 
-				local bID = LibraryData.getIDState("item", vNode, true)
+				local bID = LibraryData.getIDState('item', vNode, true)
 
 				local bIsShield = ItemManager.isShield(vNode)
 				if bIsShield then
 					if bID then
-						nMainShieldTotal = nMainShieldTotal
-							+ DB.getValue(vNode, "ac", 0)
-							+ DB.getValue(vNode, "bonus", 0)
+						nMainShieldTotal = nMainShieldTotal + DB.getValue(vNode, 'ac', 0) + DB.getValue(vNode, 'bonus', 0)
 					else
-						nMainShieldTotal = nMainShieldTotal + DB.getValue(vNode, "ac", 0)
+						nMainShieldTotal = nMainShieldTotal + DB.getValue(vNode, 'ac', 0)
 					end
 				else
 					if bID then
-						nMainArmorTotal = nMainArmorTotal + DB.getValue(vNode, "ac", 0) + DB.getValue(vNode, "bonus", 0)
+						nMainArmorTotal = nMainArmorTotal + DB.getValue(vNode, 'ac', 0) + DB.getValue(vNode, 'bonus', 0)
 					else
-						nMainArmorTotal = nMainArmorTotal + DB.getValue(vNode, "ac", 0)
+						nMainArmorTotal = nMainArmorTotal + DB.getValue(vNode, 'ac', 0)
 					end
 
-					local sSubtypeLower = StringManager.trim(DB.getValue(vNode, "subtype", "")):lower()
+					local sSubtypeLower = StringManager.trim(DB.getValue(vNode, 'subtype', '')):lower()
 
-					if sSubtypeLower:match("heavy") then
+					if sSubtypeLower:match('heavy') then
 						bArmorH = true
-					elseif sSubtypeLower:match("light") or sSubtypeLower:match("medium") then
+					elseif sSubtypeLower:match('light') or sSubtypeLower:match('medium') then
 						bArmorLM = true
 					end
 
-					local nItemSpeed30 = DB.getValue(vNode, "speed30", 0)
+					local nItemSpeed30 = DB.getValue(vNode, 'speed30', 0)
 					if (nItemSpeed30 > 0) and (nItemSpeed30 < 30) then
 						if bArmorLM and bArmorTraining then
 							nItemSpeed30 = 30
@@ -305,7 +293,7 @@ local function calcItemArmorClass_new(nodeChar)
 							nMainSpeed30 = nItemSpeed30
 						end
 					end
-					local nItemSpeed20 = DB.getValue(vNode, "speed20", 0)
+					local nItemSpeed20 = DB.getValue(vNode, 'speed20', 0)
 					if (nItemSpeed20 > 0) and (nItemSpeed20 < 30) then
 						if bArmorLM and bArmorTraining then
 							nItemSpeed20 = 20
@@ -321,7 +309,7 @@ local function calcItemArmorClass_new(nodeChar)
 					end
 				end
 
-				local nMaxStatBonus = DB.getValue(vNode, "maxstatbonus", 0)
+				local nMaxStatBonus = DB.getValue(vNode, 'maxstatbonus', 0)
 				if nMaxStatBonus > 0 then
 					if not bIsShield and bArmorTraining then
 						if nFighterLevel >= 15 and not bAdvArmorTraining then
@@ -342,16 +330,16 @@ local function calcItemArmorClass_new(nodeChar)
 					end
 				else
 					for _, v in pairs(TEGlobals.tClumsyArmorTypes) do
-						if string.find(string.lower(DB.getValue(vNode, "name", 0)), string.lower(v)) then
+						if string.find(string.lower(DB.getValue(vNode, 'name', 0)), string.lower(v)) then
 							nMainMaxStatBonus = 0
 							break
 						end
 					end
 				end
 
-				local nCheckPenalty = DB.getValue(vNode, "checkpenalty", 0)
+				local nCheckPenalty = DB.getValue(vNode, 'checkpenalty', 0)
 				if nCheckPenalty < 0 then
-					if not bIsShield and CharManager.hasTrait(nodeChar, "Armor Expert") then
+					if not bIsShield and CharManager.hasTrait(nodeChar, 'Armor Expert') then
 						nCheckPenalty = nCheckPenalty + 1
 					end
 					if not bIsShield and bArmorTraining then
@@ -371,7 +359,7 @@ local function calcItemArmorClass_new(nodeChar)
 					end
 				end
 
-				local nSpellFailure = DB.getValue(vNode, "spellfailure", 0)
+				local nSpellFailure = DB.getValue(vNode, 'spellfailure', 0)
 				if nSpellFailure > 0 then
 					nMainSpellFailure = nMainSpellFailure + nSpellFailure
 				end
@@ -380,49 +368,49 @@ local function calcItemArmorClass_new(nodeChar)
 	end
 
 	if bArmorH then
-		DB.setValue(nodeChar, "encumbrance.armortype", "number", 2)
+		DB.setValue(nodeChar, 'encumbrance.armortype', 'number', 2)
 	elseif bArmorLM then
-		DB.setValue(nodeChar, "encumbrance.armortype", "number", 1)
+		DB.setValue(nodeChar, 'encumbrance.armortype', 'number', 1)
 	else
-		DB.setValue(nodeChar, "encumbrance.armortype", "number", 0)
+		DB.setValue(nodeChar, 'encumbrance.armortype', 'number', 0)
 	end
 
 	--	Bring in encumbrance penalties
 	local nEncMaxStatBonus, nEncCheckPenalty, nEncumbranceLevel = encumbrancePenalties(nodeChar)
 	if nEncMaxStatBonus then
 		nMainMaxStatBonus = math.min(nMainMaxStatBonus, nEncMaxStatBonus)
-		DB.setValue(nodeChar, "encumbrance.maxstatbonusfromenc", "number", nEncMaxStatBonus)
+		DB.setValue(nodeChar, 'encumbrance.maxstatbonusfromenc', 'number', nEncMaxStatBonus)
 	else
-		DB.setValue(nodeChar, "encumbrance.maxstatbonusfromenc", "number", nil)
+		DB.setValue(nodeChar, 'encumbrance.maxstatbonusfromenc', 'number', nil)
 	end
 	if nEncCheckPenalty then
 		nMainCheckPenalty = math.min(nMainCheckPenalty, nEncCheckPenalty)
-		DB.setValue(nodeChar, "encumbrance.checkpenaltyfromenc", "number", nEncCheckPenalty)
+		DB.setValue(nodeChar, 'encumbrance.checkpenaltyfromenc', 'number', nEncCheckPenalty)
 	else
-		DB.setValue(nodeChar, "encumbrance.checkpenaltyfromenc", "number", nil)
+		DB.setValue(nodeChar, 'encumbrance.checkpenaltyfromenc', 'number', nil)
 	end
 
-	DB.setValue(nodeChar, "ac.sources.armor", "number", nMainArmorTotal)
-	DB.setValue(nodeChar, "ac.sources.shield", "number", nMainShieldTotal)
-	DB.setValue(nodeChar, "encumbrance.armormaxstatbonus", "number", nMainMaxStatBonus)
+	DB.setValue(nodeChar, 'ac.sources.armor', 'number', nMainArmorTotal)
+	DB.setValue(nodeChar, 'ac.sources.shield', 'number', nMainShieldTotal)
+	DB.setValue(nodeChar, 'encumbrance.armormaxstatbonus', 'number', nMainMaxStatBonus)
 
 	if nMainMaxStatBonus < 999 or nMainCheckPenalty < 0 then
-		DB.setValue(nodeChar, "encumbrance.armormaxstatbonusactive", "number", 0)
-		DB.setValue(nodeChar, "encumbrance.armormaxstatbonusactive", "number", 1)
+		DB.setValue(nodeChar, 'encumbrance.armormaxstatbonusactive', 'number', 0)
+		DB.setValue(nodeChar, 'encumbrance.armormaxstatbonusactive', 'number', 1)
 	else
-		DB.setValue(nodeChar, "encumbrance.armormaxstatbonusactive", "number", 1)
-		DB.setValue(nodeChar, "encumbrance.armormaxstatbonusactive", "number", 0)
+		DB.setValue(nodeChar, 'encumbrance.armormaxstatbonusactive', 'number', 1)
+		DB.setValue(nodeChar, 'encumbrance.armormaxstatbonusactive', 'number', 0)
 	end
-	DB.setValue(nodeChar, "encumbrance.armorcheckpenalty", "number", nMainCheckPenalty)
-	DB.setValue(nodeChar, "encumbrance.spellfailure", "number", nMainSpellFailure)
+	DB.setValue(nodeChar, 'encumbrance.armorcheckpenalty', 'number', nMainCheckPenalty)
+	DB.setValue(nodeChar, 'encumbrance.spellfailure', 'number', nMainSpellFailure)
 
-	local nSpeedBase = DB.getValue(nodeChar, "speed.base", 0)
+	local nSpeedBase = DB.getValue(nodeChar, 'speed.base', 0)
 
 	-- compute speed including total encumberance speed penalty
 
 	local nSpeedArmor = 0
 
-	local bSlowSteady = CharManager.hasTrait(nodeChar, "Slow and Steady")
+	local bSlowSteady = CharManager.hasTrait(nodeChar, 'Slow and Steady')
 
 	if not bSlowSteady then
 		if (nSpeedBase >= 30) and (nMainSpeed30 > 0) then
@@ -448,13 +436,13 @@ local function calcItemArmorClass_new(nodeChar)
 			end
 		end
 	end
-	DB.setValue(nodeChar, "speed.armor", "number", nSpeedArmor)
+	DB.setValue(nodeChar, 'speed.armor', 'number', nSpeedArmor)
 
 	local nSpeedTotal = (
 		nSpeedBase
 		+ nSpeedArmor
-		+ DB.getValue(nodeChar, "speed.misc", 0)
-		+ DB.getValue(nodeChar, "speed.temporary", 0)
+		+ DB.getValue(nodeChar, 'speed.misc', 0)
+		+ DB.getValue(nodeChar, 'speed.temporary', 0)
 		+ getSpeedEffects(nodeChar)
 	) * getSpeedMult(nodeChar)
 
@@ -472,8 +460,8 @@ local function calcItemArmorClass_new(nodeChar)
 		nSpeedTotal = 0
 	end
 
-	DB.setValue(nodeChar, "speed.total", "number", nSpeedTotal)
-	DB.setValue(nodeChar, "speed.final", "number", nSpeedTotal)
+	DB.setValue(nodeChar, 'speed.total', 'number', nSpeedTotal)
+	DB.setValue(nodeChar, 'speed.final', 'number', nSpeedTotal)
 end
 
 local updateEncumbrance_old
@@ -487,12 +475,12 @@ local function onHealthChanged(node)
 end
 
 local function onSpeedChanged(node)
-	calcItemArmorClass_new(DB.getChild(node, "..."))
+	calcItemArmorClass_new(DB.getChild(node, '...'))
 end
 
 ---	This function is called when effect components are changed.
 local function onEffectChanged(node)
-	local rActor = ActorManager.resolveActor(DB.getChild(node, "...."))
+	local rActor = ActorManager.resolveActor(DB.getChild(node, '....'))
 	if ActorManager.isPC(rActor) then
 		calcItemArmorClass_new(ActorManager.getCreatureNode(rActor))
 	end
@@ -500,7 +488,7 @@ end
 
 ---	This function is called when effects are removed.
 local function onEffectRemoved(node)
-	local rActor = ActorManager.resolveActor(DB.getChild(node, ".."))
+	local rActor = ActorManager.resolveActor(DB.getChild(node, '..'))
 	if ActorManager.isPC(rActor) then
 		calcItemArmorClass_new(ActorManager.getCreatureNode(rActor))
 	end
@@ -508,14 +496,14 @@ end
 
 function onInit()
 	if Session.IsHost then
-		DB.addHandler(DB.getPath("charsheet.*.hp"), "onChildUpdate", onHealthChanged)
-		DB.addHandler(DB.getPath("charsheet.*.wounds"), "onChildUpdate", onHealthChanged)
-		DB.addHandler(DB.getPath("charsheet.*.speed.base"), "onUpdate", onSpeedChanged)
-		DB.addHandler(DB.getPath("charsheet.*.speed.temporary"), "onUpdate", onSpeedChanged)
+		DB.addHandler(DB.getPath('charsheet.*.hp'), 'onChildUpdate', onHealthChanged)
+		DB.addHandler(DB.getPath('charsheet.*.wounds'), 'onChildUpdate', onHealthChanged)
+		DB.addHandler(DB.getPath('charsheet.*.speed.base'), 'onUpdate', onSpeedChanged)
+		DB.addHandler(DB.getPath('charsheet.*.speed.temporary'), 'onUpdate', onSpeedChanged)
 
-		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. ".effects.*.label"), "onUpdate", onEffectChanged)
-		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. ".effects.*.isactive"), "onUpdate", onEffectChanged)
-		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. ".effects"), "onChildDeleted", onEffectRemoved)
+		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.label'), 'onUpdate', onEffectChanged)
+		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.isactive'), 'onUpdate', onEffectChanged)
+		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects'), 'onChildDeleted', onEffectRemoved)
 	end
 
 	updateEncumbrance_old = CharEncumbranceManager.updateEncumbrance
